@@ -37,6 +37,11 @@ import {
   githubAuthApiRef,
 } from '@backstage/core-plugin-api';
 import { AuthProxyDiscoveryApi } from './AuthProxyDiscoveryApi';
+import {
+  catalogApiRef,
+  entityPresentationApiRef,
+} from '@backstage/plugin-catalog-react';
+import { DefaultEntityPresentationApi } from '@backstage/plugin-catalog';
 
 export const apis: AnyApiFactory[] = [
   createApiFactory({
@@ -78,4 +83,11 @@ export const apis: AnyApiFactory[] = [
   }),
 
   createApiFactory(costInsightsApiRef, new ExampleCostInsightsClient()),
+
+  createApiFactory({
+    api: entityPresentationApiRef,
+    deps: { catalogApi: catalogApiRef },
+    factory: ({ catalogApi }) =>
+      DefaultEntityPresentationApi.create({ catalogApi }),
+  }),
 ];
