@@ -1,5 +1,5 @@
 {
-  "name": "@backstage/plugin-catalog-import",
+  "name": "@novonordisk/plugin-catalog-import",
   "version": "0.10.7-next.1",
   "description": "A Backstage plugin the helps you import entities into your catalog",
   "backstage": {
