@@ -233,7 +233,9 @@ export const StepPrepareCreatePullRequest = (
               })}
 
               <Box marginTop={2}>
-                <Typography variant="h6">Preview Pull Request</Typography>
+                <Typography variant="h6">
+                  Preview your Novo Pull Request
+                </Typography>
               </Box>
 
               <PreviewPullRequestComponent
