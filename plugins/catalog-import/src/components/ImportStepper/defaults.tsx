@@ -210,6 +210,17 @@ export function defaultGenerateStepper(
                       required
                     />
 
+                    <TextField
+                      {...asInputRef(
+                        register('componentDescription', { required: true }),
+                      )}
+                      label="Description of the created component"
+                      placeholder=""
+                      margin="normal"
+                      variant="outlined"
+                      fullWidth
+                    />
+
                     {!values.useCodeowners && (
                       <AutocompleteTextField
                         name="owner"

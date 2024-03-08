@@ -49,6 +49,7 @@ type FormData = {
   title: string;
   body: string;
   componentName: string;
+  componentDescription: string;
   owner: string;
   useCodeowners: boolean;
 };
@@ -81,6 +82,7 @@ export interface StepPrepareCreatePullRequestProps {
 export function generateEntities(
   entities: PartialEntity[],
   componentName: string,
+  componentDescription: string,
   owner?: string,
 ): Entity[] {
   return entities.map(e => ({
@@ -90,6 +92,7 @@ export function generateEntities(
     metadata: {
       ...e.metadata,
       name: componentName,
+      description: componentDescription,
     },
     spec: {
       ...e.spec,
@@ -155,6 +158,7 @@ export const StepPrepareCreatePullRequest = (
           fileContent: generateEntities(
             analyzeResult.generatedEntities,
             data.componentName,
+            data.componentDescription,
             data.owner,
           )
             .map(e => YAML.stringify(e))
@@ -175,6 +179,7 @@ export const StepPrepareCreatePullRequest = (
                 entities: generateEntities(
                   analyzeResult.generatedEntities,
                   data.componentName,
+                  data.componentDescription,
                   data.owner,
                 ).map(e => ({
                   kind: e.kind,
@@ -255,6 +260,7 @@ export const StepPrepareCreatePullRequest = (
                 entities={generateEntities(
                   analyzeResult.generatedEntities,
                   values.componentName,
+                  values.componentDescription,
                   values.owner,
                 )}
                 repositoryUrl={analyzeResult.url}
