@@ -37,7 +37,7 @@ import { homePage } from './HomePage';
 import { convertLegacyApp } from '@backstage/core-compat-api';
 import { FlatRoutes } from '@backstage/core-app-api';
 import { Route } from 'react-router';
-import { CatalogImportPage } from '@backstage/plugin-catalog-import';
+import { CatalogImportPage } from '@novonordisk/plugin-catalog-import';
 import {
   createApiFactory,
   configApiRef,
