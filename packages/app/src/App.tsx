@@ -46,7 +46,7 @@ import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import {
   CatalogImportPage,
   catalogImportPlugin,
-} from '@novonordisk/plugin-catalog-import';
+} from '@piatkiewicz/backstage-plugin-catalog-import';
 import {
   CostInsightsLabelDataflowInstructionsPage,
   CostInsightsPage,

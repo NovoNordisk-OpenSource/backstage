@@ -1,8 +1,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: novonordisk-plugin-catalog-import
-  title: "@novonordisk/plugin-catalog-import"
+  name: piatkiewicz-backstage-plugin-catalog-import
+  title: "@piatkiewicz/backstage-plugin-catalog-import"
   description: A Backstage plugin the helps you import entities into your catalog
 spec:
   lifecycle: experimental

@@ -13733,49 +13733,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@novonordisk/plugin-catalog-import@workspace:^, @novonordisk/plugin-catalog-import@workspace:plugins/catalog-import":
-  version: 0.0.0-use.local
-  resolution: "@novonordisk/plugin-catalog-import@workspace:plugins/catalog-import"
-  dependencies:
-    "@backstage/catalog-client": "workspace:^"
-    "@backstage/catalog-model": "workspace:^"
-    "@backstage/cli": "workspace:^"
-    "@backstage/config": "workspace:^"
-    "@backstage/core-app-api": "workspace:^"
-    "@backstage/core-compat-api": "workspace:^"
-    "@backstage/core-components": "workspace:^"
-    "@backstage/core-plugin-api": "workspace:^"
-    "@backstage/dev-utils": "workspace:^"
-    "@backstage/errors": "workspace:^"
-    "@backstage/frontend-plugin-api": "workspace:^"
-    "@backstage/integration": "workspace:^"
-    "@backstage/integration-react": "workspace:^"
-    "@backstage/plugin-catalog-common": "workspace:^"
-    "@backstage/plugin-catalog-react": "workspace:^"
-    "@backstage/test-utils": "workspace:^"
-    "@material-ui/core": ^4.12.2
-    "@material-ui/icons": ^4.9.1
-    "@material-ui/lab": 4.0.0-alpha.61
-    "@octokit/rest": ^19.0.3
-    "@testing-library/dom": ^9.0.0
-    "@testing-library/jest-dom": ^6.0.0
-    "@testing-library/react": ^14.0.0
-    "@testing-library/user-event": ^14.0.0
-    "@types/react": ^16.13.1 || ^17.0.0 || ^18.0.0
-    git-url-parse: ^14.0.0
-    js-base64: ^3.6.0
-    lodash: ^4.17.21
-    msw: ^1.0.0
-    react-hook-form: ^7.12.2
-    react-use: ^17.2.4
-    yaml: ^2.0.0
-  peerDependencies:
-    react: ^16.13.1 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
-    react-router-dom: 6.0.0-beta.0 || ^6.3.0
-  languageName: unknown
-  linkType: soft
-
 "@npmcli/agent@npm:^2.0.0":
   version: 2.2.0
   resolution: "@npmcli/agent@npm:2.2.0"
@@ -14895,6 +14852,49 @@ __metadata:
   checksum: 4d1bf78b3fc6cce80b3cbc1abef5613bb609d2262e0d410aa57cc7e175eaf5cb727796ab61b44507f5c826b1f059f4ec03c280ce6cdbf7291d4461d745a9b5b6
   languageName: node
   linkType: hard
+
+"@piatkiewicz/backstage-plugin-catalog-import@workspace:^, @piatkiewicz/backstage-plugin-catalog-import@workspace:plugins/catalog-import":
+  version: 0.0.0-use.local
+  resolution: "@piatkiewicz/backstage-plugin-catalog-import@workspace:plugins/catalog-import"
+  dependencies:
+    "@backstage/catalog-client": "workspace:^"
+    "@backstage/catalog-model": "workspace:^"
+    "@backstage/cli": "workspace:^"
+    "@backstage/config": "workspace:^"
+    "@backstage/core-app-api": "workspace:^"
+    "@backstage/core-compat-api": "workspace:^"
+    "@backstage/core-components": "workspace:^"
+    "@backstage/core-plugin-api": "workspace:^"
+    "@backstage/dev-utils": "workspace:^"
+    "@backstage/errors": "workspace:^"
+    "@backstage/frontend-plugin-api": "workspace:^"
+    "@backstage/integration": "workspace:^"
+    "@backstage/integration-react": "workspace:^"
+    "@backstage/plugin-catalog-common": "workspace:^"
+    "@backstage/plugin-catalog-react": "workspace:^"
+    "@backstage/test-utils": "workspace:^"
+    "@material-ui/core": ^4.12.2
+    "@material-ui/icons": ^4.9.1
+    "@material-ui/lab": 4.0.0-alpha.61
+    "@octokit/rest": ^19.0.3
+    "@testing-library/dom": ^9.0.0
+    "@testing-library/jest-dom": ^6.0.0
+    "@testing-library/react": ^14.0.0
+    "@testing-library/user-event": ^14.0.0
+    "@types/react": ^16.13.1 || ^17.0.0 || ^18.0.0
+    git-url-parse: ^14.0.0
+    js-base64: ^3.6.0
+    lodash: ^4.17.21
+    msw: ^1.0.0
+    react-hook-form: ^7.12.2
+    react-use: ^17.2.4
+    yaml: ^2.0.0
+  peerDependencies:
+    react: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
+    react-router-dom: 6.0.0-beta.0 || ^6.3.0
+  languageName: unknown
+  linkType: soft
 
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
@@ -27620,9 +27620,9 @@ __metadata:
     "@material-ui/core": ^4.12.2
     "@material-ui/icons": ^4.9.1
     "@material-ui/lab": 4.0.0-alpha.61
-    "@novonordisk/plugin-catalog-import": "workspace:^"
     "@octokit/rest": ^19.0.3
     "@oriflame/backstage-plugin-score-card": ^0.8.0
+    "@piatkiewicz/backstage-plugin-catalog-import": "workspace:^"
     "@roadiehq/backstage-plugin-buildkite": ^2.0.8
     "@roadiehq/backstage-plugin-github-insights": ^2.0.5
     "@roadiehq/backstage-plugin-github-pull-requests": ^2.2.7
@@ -27735,9 +27735,9 @@ __metadata:
     "@material-ui/core": ^4.12.2
     "@material-ui/icons": ^4.9.1
     "@material-ui/lab": 4.0.0-alpha.61
-    "@novonordisk/plugin-catalog-import": "workspace:^"
     "@octokit/rest": ^19.0.3
     "@oriflame/backstage-plugin-score-card": ^0.8.0
+    "@piatkiewicz/backstage-plugin-catalog-import": "workspace:^"
     "@playwright/test": ^1.32.3
     "@roadiehq/backstage-plugin-buildkite": ^2.0.8
     "@roadiehq/backstage-plugin-github-insights": ^2.0.5

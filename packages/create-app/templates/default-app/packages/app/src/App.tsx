@@ -9,7 +9,7 @@ import {
 import {
   CatalogImportPage,
   catalogImportPlugin,
-} from '@novonordisk/plugin-catalog-import';
+} from '@piatkiewicz/backstage-plugin-catalog-import';
 import { ScaffolderPage, scaffolderPlugin } from '@backstage/plugin-scaffolder';
 import { orgPlugin } from '@backstage/plugin-org';
 import { SearchPage } from '@backstage/plugin-search';

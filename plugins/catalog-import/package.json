@@ -1,6 +1,6 @@
 {
-  "name": "@novonordisk/plugin-catalog-import",
-  "version": "0.13.6",
+  "name": "@piatkiewicz/backstage-plugin-catalog-import",
+  "version": "0.0.1",
   "description": "A Backstage plugin the helps you import entities into your catalog",
   "backstage": {
     "role": "frontend-plugin"
@@ -14,7 +14,7 @@
   "homepage": "https://backstage.io",
   "repository": {
     "type": "git",
-    "url": "https://github.com/backstage/backstage",
+    "url": "git+https://github.com/NovoNordisk-OpenSource/backstage.git",
     "directory": "plugins/catalog-import"
   },
   "license": "Apache-2.0",
@@ -90,5 +90,6 @@
     "react-dom": "^16.13.1 || ^17.0.0 || ^18.0.0",
     "react-router-dom": "6.0.0-beta.0 || ^6.3.0"
   },
-  "configSchema": "config.d.ts"
+  "configSchema": "config.d.ts",
+  "author": "Piotr Piątkiewicz"
 }
