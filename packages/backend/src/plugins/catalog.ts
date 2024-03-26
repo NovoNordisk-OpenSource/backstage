@@ -16,6 +16,7 @@
 
 import { CatalogBuilder } from '@backstage/plugin-catalog-backend';
 import { ScaffolderEntitiesProcessor } from '@backstage/plugin-catalog-backend-module-scaffolder-entity-model';
+import { MidgardEntityProvider } from '@backstage/plugin-catalog-backend-module-heimdall';
 import { UnprocessedEntitiesModule } from '@backstage/plugin-catalog-backend-module-unprocessed';
 import { Router } from 'express';
 import { PluginEnvironment } from '../types';
@@ -34,6 +35,15 @@ export default async function createPlugin(
   });
   await demoProvider.subscribe();
   builder.addEntityProvider(demoProvider);
+  
+  // TODO: Topics should be fetched from the app-config settings via env.config.get('some.path.to.cfg.value')
+  const midgardProvider = new MidgardEntityProvider({
+    events: env.events,
+    logger: env.logger,
+    topics: ['example'],
+  });
+  await midgardProvider.subscribe();
+  builder.addEntityProvider(midgardProvider);
 
   const { processingEngine, router } = await builder.build();
 

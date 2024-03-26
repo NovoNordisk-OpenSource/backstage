@@ -5483,6 +5483,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@backstage/plugin-catalog-backend-module-heimdall@^0.0.0, @backstage/plugin-catalog-backend-module-heimdall@workspace:plugins/catalog-backend-module-heimdall":
+  version: 0.0.0-use.local
+  resolution: "@backstage/plugin-catalog-backend-module-heimdall@workspace:plugins/catalog-backend-module-heimdall"
+  dependencies:
+    "@backstage/backend-common": "workspace:^"
+    "@backstage/backend-plugin-api": "workspace:^"
+    "@backstage/backend-test-utils": "workspace:^"
+    "@backstage/cli": "workspace:^"
+  languageName: unknown
+  linkType: soft
+
 "@backstage/plugin-catalog-backend-module-incremental-ingestion@workspace:plugins/catalog-backend-module-incremental-ingestion":
   version: 0.0.0-use.local
   resolution: "@backstage/plugin-catalog-backend-module-incremental-ingestion@workspace:plugins/catalog-backend-module-incremental-ingestion"
@@ -27365,6 +27376,7 @@ __metadata:
     "@backstage/plugin-azure-sites-common": "workspace:^"
     "@backstage/plugin-badges-backend": "workspace:^"
     "@backstage/plugin-catalog-backend": "workspace:^"
+    "@backstage/plugin-catalog-backend-module-heimdall": ^0.0.0
     "@backstage/plugin-catalog-backend-module-scaffolder-entity-model": "workspace:^"
     "@backstage/plugin-catalog-backend-module-unprocessed": "workspace:^"
     "@backstage/plugin-catalog-node": "workspace:^"
