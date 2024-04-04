@@ -36,13 +36,10 @@ export default async function createPlugin(
   await demoProvider.subscribe();
   builder.addEntityProvider(demoProvider);
   
-  // TODO: Topics should be fetched from the app-config settings via env.config.get('some.path.to.cfg.value')
   const midgardProvider = new MidgardEntityProvider({
-    events: env.events,
     logger: env.logger,
-    topics: ['example'],
+    config: env.config,
   });
-  await midgardProvider.subscribe();
   builder.addEntityProvider(midgardProvider);
 
   const { processingEngine, router } = await builder.build();

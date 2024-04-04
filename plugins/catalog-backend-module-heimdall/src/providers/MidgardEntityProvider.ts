@@ -1,54 +1,81 @@
+import { moduleId } from '../module';
+import { Kafka } from 'kafkajs';
+import { Logger } from 'winston';
+import { Config } from '@backstage/config';
 import {
   EntityProvider,
   EntityProviderConnection,
 } from '@backstage/plugin-catalog-node';
-import { EventParams, EventsService } from '@backstage/plugin-events-node';
-import { Logger } from 'winston';
 
 export class MidgardEntityProvider implements EntityProvider {
   private connection?: EntityProviderConnection;  
   private readonly logger: Logger;
-  private readonly events: EventsService;
-  private readonly topics: string[];
+  private readonly cluster: any;
+  private readonly client: any;
 
   constructor(opts: {
-    events: EventsService;
     logger: Logger;
-    topics: string[];
+    config: Config;
   }) {
-    this.events = opts.events;
     this.logger = opts.logger;
-    this.topics = opts.topics;
+    const kafkaConfig: Config = opts.config?.getConfig('kafka');
+
+    for (const clusterConfig of kafkaConfig.getConfigArray('clusters')) {
+      if(clusterConfig.getString('name') === moduleId) {
+        this.cluster = { clientId: kafkaConfig.getString("clientId"), brokers: clusterConfig.getStringArray('brokers') };
+
+        for (const clientConfig of clusterConfig.getConfigArray('clients')) {
+          if(clientConfig.getString('name') === this.getProviderName()) {
+            this.client = { name: this.getProviderName(), topics: clientConfig.getStringArray('topics'), fromBeginning: clientConfig.getBoolean('fromBeginning')};
+            break;
+          }
+        }
+
+        break;
+      }
+    }
+    
+    if (!this.cluster) {
+      throw new Error(`${moduleId} cluster config not found`);
+    }
+    
+    if (!this.client) {
+      throw new Error(`${this.getProviderName()} client not found`);
+    }
   }
 
   getProviderName(): string {
-    return `midgard-entity-provider`;
+    return `${moduleId}-midgard-entity-provider`;
   }
 
+  // TODO: Investigate EventsService API once POC is done @ https://github.com/backstage/backstage/issues/20561
+  /** {@inheritdoc @backstage/plugin-catalog-backend#EntityProvider.connect} */
   async connect(connection: EntityProviderConnection): Promise<void> {
     this.connection = connection;
-  }
 
-  async subscribe() {
-    await this.events.subscribe({
-      id: 'MidgardEntityProvider',
-      topics: this.topics,
-      onEvent: async (params: EventParams): Promise<void> => {
-        if (!this.connection) {
-          throw new Error('Connection not initialized');
-        }
+    const kafka = new Kafka({
+      clientId: this.cluster.clientId,
+      brokers: this.cluster.brokers,
+    })
 
-        this.logger.info(
-          `onEvent: topic=${params.topic}, metadata=${JSON.stringify(
-            params.metadata,
-          )}, payload=${JSON.stringify(params.eventPayload)}`,
-        );
+    const consumer = kafka.consumer({ groupId: this.client.name });
 
-        // TODO: Investigate EventsService API and figure out if there is a way to connect it with kafka using the existing kafka-plugin logic
-        // TODO: Fetch events from Midgard Kafka Broker either indirectly via EventsService or direectly via a KafkaClient
-        // TODO: Convert topic messages into catalog entities (kind: template)
-        // TODO: applyMutation(entities) and pass them to the connection for ingestion into the catalog
+    await consumer.connect()
+    await consumer.subscribe({ topics: this.client.topics, fromBeginning: this.client.fromBeginning })
+
+    // TODO: Convert topic messages into catalog entities (kind: template)
+    // TODO: applyMutation(entities) and pass them to the connection for ingestion into the catalog
+    await consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        this.logger.info(JSON.stringify({
+          conntion: this.connection,
+          topic: topic,
+          partition: partition,
+          key: message.key?.toString(),
+          value: message.value?.toString(),
+          headers: message.headers,
+        }));
       },
-    });
+    })
   }
 }

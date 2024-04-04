@@ -189,7 +189,14 @@ kafka:
     - name: cluster
       dashboardUrl: https://akhq.io/
       brokers:
+        - localhost:9092    
+    - name: heimdall
+      brokers:
         - localhost:9092
+      clients:
+        - name: heimdall-midgard-entity-provider
+          fromBeginning: false
+          topics: ['test-topic-1', 'test-topic-2']
 
 allure:
   baseUrl: http://localhost:5050/allure-docker-service

@@ -5639,6 +5639,25 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@backstage/plugin-catalog-backend-module-heimdall@^0.0.0, @backstage/plugin-catalog-backend-module-heimdall@workspace:plugins/catalog-backend-module-heimdall":
+  version: 0.0.0-use.local
+  resolution: "@backstage/plugin-catalog-backend-module-heimdall@workspace:plugins/catalog-backend-module-heimdall"
+  dependencies:
+    "@backstage/backend-common": "workspace:^"
+    "@backstage/backend-plugin-api": "workspace:^"
+    "@backstage/backend-test-utils": "workspace:^"
+    "@backstage/catalog-client": "workspace:^"
+    "@backstage/catalog-model": "workspace:^"
+    "@backstage/cli": "workspace:^"
+    "@backstage/plugin-catalog-backend": "workspace:^"
+    "@backstage/plugin-catalog-common": "workspace:^"
+    "@backstage/plugin-catalog-node": "workspace:^"
+    "@backstage/plugin-events-node": "workspace:^"
+    kafkajs: ^2.2.4
+    winston: ^3.2.1
+  languageName: unknown
+  linkType: soft
+
 "@backstage/plugin-catalog-backend-module-incremental-ingestion@workspace:plugins/catalog-backend-module-incremental-ingestion":
   version: 0.0.0-use.local
   resolution: "@backstage/plugin-catalog-backend-module-incremental-ingestion@workspace:plugins/catalog-backend-module-incremental-ingestion"
@@ -27603,6 +27622,7 @@ __metadata:
     "@backstage/plugin-azure-sites-common": "workspace:^"
     "@backstage/plugin-badges-backend": "workspace:^"
     "@backstage/plugin-catalog-backend": "workspace:^"
+    "@backstage/plugin-catalog-backend-module-heimdall": ^0.0.0
     "@backstage/plugin-catalog-backend-module-scaffolder-entity-model": "workspace:^"
     "@backstage/plugin-catalog-backend-module-unprocessed": "workspace:^"
     "@backstage/plugin-catalog-node": "workspace:^"
@@ -33081,7 +33101,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kafkajs@npm:^2.0.0":
+"kafkajs@npm:^2.0.0, kafkajs@npm:^2.2.4":
   version: 2.2.4
   resolution: "kafkajs@npm:2.2.4"
   checksum: 83e9e8bc50a09b142f4ff79f6a2bd88ecc21b83bcefe6621ab1716118d624886befb7371731274f67812ce35dd50b53140ff3b49a06e5d9169fe6b164d72fea5

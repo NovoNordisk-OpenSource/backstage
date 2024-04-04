@@ -18,9 +18,10 @@ import {
   createBackendModule,
 } from '@backstage/backend-plugin-api';
 
+export const moduleId = 'heimdall';
 export const catalogModuleHeimdall = createBackendModule({
   pluginId: 'catalog',
-  moduleId: 'heimdall',
+  moduleId: moduleId,
   register(reg) {
     reg.registerInit({
       deps: {         
