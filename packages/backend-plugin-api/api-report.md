@@ -55,6 +55,10 @@ export interface AuthService {
     credentials: BackstageCredentials,
     type: TType,
   ): credentials is BackstageCredentials<BackstagePrincipalTypes[TType]>;
+  // (undocumented)
+  listPublicServiceKeys(): Promise<{
+    keys: JsonObject[];
+  }>;
 }
 
 // @public (undocumented)
@@ -321,7 +325,7 @@ export interface HttpAuthService {
   issueUserCookie(
     res: Response_2,
     options?: {
-      credentials?: BackstageCredentials<BackstageUserPrincipal>;
+      credentials?: BackstageCredentials;
     },
   ): Promise<{
     expiresAt: Date;
@@ -438,7 +442,6 @@ export interface PluginServiceFactoryConfig<
     deps: ServiceRefsToInstances<TDeps>,
     context: TContext,
   ): TImpl | Promise<TImpl>;
-  // (undocumented)
   initialization?: 'always' | 'lazy';
   // (undocumented)
   service: ServiceRef<TService, 'plugin'>;
@@ -519,7 +522,6 @@ export interface RootServiceFactoryConfig<
   deps: TDeps;
   // (undocumented)
   factory(deps: ServiceRefsToInstances<TDeps, 'root'>): TImpl | Promise<TImpl>;
-  // (undocumented)
   initialization?: 'always' | 'lazy';
   // (undocumented)
   service: ServiceRef<TService, 'root'>;
