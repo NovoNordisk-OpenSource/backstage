@@ -95,6 +95,7 @@ module.exports = {
   plugins: [
     'docusaurus-plugin-sass',
     () => ({
+      name: 'yaml-loader',
       configureWebpack() {
         return {
           module: {
@@ -163,6 +164,15 @@ module.exports = {
         ],
       },
     ],
+    [
+      'docusaurus-pushfeedback',
+      {
+        project: 'q8w1i6cair',
+        hideIcon: true,
+        customFont: true,
+        buttonStyle: 'dark',
+      },
+    ],
   ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
@@ -198,7 +208,7 @@ module.exports = {
             position: 'left',
           },
           {
-            to: 'docs/releases/v1.25.0',
+            to: 'docs/releases/v1.26.0',
             label: 'Releases',
             position: 'left',
           },

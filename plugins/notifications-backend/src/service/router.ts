@@ -28,10 +28,14 @@ import {
   isGroupEntity,
   isUserEntity,
   RELATION_HAS_MEMBER,
+  RELATION_OWNED_BY,
   RELATION_PARENT_OF,
   stringifyEntityRef,
 } from '@backstage/catalog-model';
-import { NotificationProcessor } from '@backstage/plugin-notifications-node';
+import {
+  NotificationProcessor,
+  NotificationSendOptions,
+} from '@backstage/plugin-notifications-node';
 import { InputError } from '@backstage/errors';
 import {
   AuthService,
@@ -45,6 +49,7 @@ import {
   NewNotificationSignal,
   Notification,
   NotificationReadSignal,
+  NotificationStatus,
 } from '@backstage/plugin-notifications-common';
 import { parseEntityOrderFieldParams } from './parseEntityOrderFieldParams';
 
@@ -73,7 +78,7 @@ export async function createRouter(
     userInfo,
     discovery,
     catalog,
-    processors,
+    processors = [],
     signals,
   } = options;
 
@@ -99,17 +104,13 @@ export async function createRouter(
       return [];
     }
 
+    const fields = ['kind', 'metadata.name', 'metadata.namespace', 'relations'];
+
     const refs = Array.isArray(entityRef) ? entityRef : [entityRef];
     const entities = await catalogClient.getEntitiesByRefs(
       {
         entityRefs: refs,
-        fields: [
-          'kind',
-          'metadata.name',
-          'metadata.namespace',
-          'relations',
-          'spec.owner',
-        ],
+        fields,
       },
       { token },
     );
@@ -122,29 +123,17 @@ export async function createRouter(
         return [stringifyEntityRef(entity)];
       } else if (isGroupEntity(entity) && entity.relations) {
         const users = entity.relations
-          .filter(
-            relation =>
-              relation.type === RELATION_HAS_MEMBER && relation.targetRef,
-          )
+          .filter(relation => relation.type === RELATION_HAS_MEMBER)
           .map(r => r.targetRef);
 
         const childGroupRefs = entity.relations
-          .filter(
-            relation =>
-              relation.type === RELATION_PARENT_OF && relation.targetRef,
-          )
+          .filter(relation => relation.type === RELATION_PARENT_OF)
           .map(r => r.targetRef);
 
         const childGroups = await catalogClient.getEntitiesByRefs(
           {
             entityRefs: childGroupRefs,
-            fields: [
-              'kind',
-              'metadata.name',
-              'metadata.namespace',
-              'relations',
-              'spec.owner',
-            ],
+            fields,
           },
           { token },
         );
@@ -152,13 +141,16 @@ export async function createRouter(
           childGroups.items.map(mapEntity),
         );
         return [...users, ...childGroupUsers.flat(2)];
-      } else if (!isGroupEntity(entity) && entity.spec?.owner) {
-        const owner = await catalogClient.getEntityByRef(
-          entity.spec.owner as string,
-          { token },
-        );
-        if (owner) {
-          return mapEntity(owner);
+      } else if (entity.relations) {
+        const ownerRef = entity.relations.find(
+          relation => relation.type === RELATION_OWNED_BY,
+        )?.targetRef;
+
+        if (ownerRef) {
+          const owner = await catalogClient.getEntityByRef(ownerRef, { token });
+          if (owner) {
+            return mapEntity(owner);
+          }
         }
       }
 
@@ -173,18 +165,54 @@ export async function createRouter(
     return users;
   };
 
-  const decorateNotification = async (notification: Notification) => {
-    let ret = notification;
-    for (const processor of processors ?? []) {
-      ret = processor.decorate ? await processor.decorate(ret) : ret;
+  const processOptions = async (opts: NotificationSendOptions) => {
+    let ret = opts;
+    for (const processor of processors) {
+      try {
+        ret = processor.processOptions
+          ? await processor.processOptions(ret)
+          : ret;
+      } catch (e) {
+        logger.error(
+          `Error while processing notification options with ${processor.getName()}: ${e}`,
+        );
+      }
     }
     return ret;
   };
 
-  const processorSendNotification = async (notification: Notification) => {
-    for (const processor of processors ?? []) {
-      if (processor.send) {
-        processor.send(notification);
+  const preProcessNotification = async (
+    notification: Notification,
+    opts: NotificationSendOptions,
+  ) => {
+    let ret = notification;
+    for (const processor of processors) {
+      try {
+        ret = processor.preProcess
+          ? await processor.preProcess(ret, opts)
+          : ret;
+      } catch (e) {
+        logger.error(
+          `Error while pre processing notification with ${processor.getName()}: ${e}`,
+        );
+      }
+    }
+    return ret;
+  };
+
+  const postProcessNotification = async (
+    notification: Notification,
+    opts: NotificationSendOptions,
+  ) => {
+    for (const processor of processors) {
+      if (processor.postProcess) {
+        try {
+          await processor.postProcess(notification, opts);
+        } catch (e) {
+          logger.error(
+            `Error while post processing notification with ${processor.getName()}: ${e}`,
+          );
+        }
       }
     }
   };
@@ -234,9 +262,9 @@ export async function createRouter(
       }
       opts.createdAfter = new Date(sinceEpoch);
     }
-    if (req.query.minimal_severity) {
+    if (req.query.minimumSeverity) {
       opts.minimumSeverity = normalizeSeverity(
-        req.query.minimal_severity.toString(),
+        req.query.minimumSeverity.toString(),
       );
     }
 
@@ -250,7 +278,7 @@ export async function createRouter(
     });
   });
 
-  router.get('/status', async (req, res) => {
+  router.get('/status', async (req: Request<any, NotificationStatus>, res) => {
     const user = await getUser(req);
     const status = await store.getStatus({ user });
     res.send(status);
@@ -313,17 +341,19 @@ export async function createRouter(
 
   const sendBroadcastNotification = async (
     baseNotification: Omit<Notification, 'user' | 'id'>,
-    opts: { scope?: string; origin: string },
+    opts: NotificationSendOptions,
+    origin: string,
   ) => {
-    const { scope, origin } = opts;
+    const { scope } = opts.payload;
     const broadcastNotification = {
       ...baseNotification,
+      user: null,
       id: uuid(),
     };
-    const notification = await decorateNotification({
-      ...broadcastNotification,
-      user: '',
-    });
+    const notification = await preProcessNotification(
+      broadcastNotification,
+      opts,
+    );
     let existingNotification;
     if (scope) {
       existingNotification = await store.getExistingScopeBroadcast({
@@ -342,7 +372,6 @@ export async function createRouter(
     } else {
       await store.saveBroadcast(notification);
     }
-    processorSendNotification(ret);
 
     if (signals) {
       await signals.publish<NewNotificationSignal>({
@@ -353,6 +382,7 @@ export async function createRouter(
         },
         channel: 'notifications',
       });
+      postProcessNotification(ret, opts);
     }
     return notification;
   };
@@ -360,10 +390,11 @@ export async function createRouter(
   const sendUserNotifications = async (
     baseNotification: Omit<Notification, 'user' | 'id'>,
     users: string[],
-    opts: { scope?: string; origin: string },
+    opts: NotificationSendOptions,
+    origin: string,
   ) => {
     const notifications = [];
-    const { scope, origin } = opts;
+    const { scope } = opts.payload;
     const uniqueUsers = [...new Set(users)];
     for (const user of uniqueUsers) {
       const userNotification = {
@@ -371,7 +402,7 @@ export async function createRouter(
         id: uuid(),
         user,
       };
-      const notification = await decorateNotification(userNotification);
+      const notification = await preProcessNotification(userNotification, opts);
 
       let existingNotification;
       if (scope) {
@@ -393,7 +424,6 @@ export async function createRouter(
         await store.saveNotification(notification);
       }
 
-      processorSendNotification(ret);
       notifications.push(ret);
 
       if (signals) {
@@ -406,59 +436,70 @@ export async function createRouter(
           channel: 'notifications',
         });
       }
+      postProcessNotification(ret, opts);
     }
     return notifications;
   };
 
   // Add new notification
-  router.post('/', async (req, res) => {
-    const { recipients, payload } = req.body;
-    const notifications = [];
-    let users = [];
+  router.post(
+    '/',
+    async (req: Request<any, Notification[], NotificationSendOptions>, res) => {
+      const opts = await processOptions(req.body);
+      const { recipients, payload } = opts;
+      const notifications: Notification[] = [];
+      let users = [];
 
-    const credentials = await httpAuth.credentials(req, { allow: ['service'] });
-
-    const { title, scope } = payload;
-
-    if (!recipients || !title) {
-      logger.error(`Invalid notification request received`);
-      throw new InputError();
-    }
-
-    const origin = credentials.principal.subject;
-    const baseNotification = {
-      payload: {
-        ...payload,
-        severity: payload.severity ?? 'normal',
-      },
-      origin,
-      created: new Date(),
-    };
-
-    if (recipients.type === 'broadcast') {
-      const broadcast = await sendBroadcastNotification(baseNotification, {
-        scope,
-        origin,
+      const credentials = await httpAuth.credentials(req, {
+        allow: ['service'],
       });
-      notifications.push(broadcast);
-    } else {
-      const entityRef = recipients.entityRef;
 
-      try {
-        users = await getUsersForEntityRef(entityRef);
-      } catch (e) {
-        throw new InputError();
+      const { title } = payload;
+
+      if (!recipients || !title) {
+        logger.error(`Invalid notification request received`);
+        throw new InputError(`Invalid notification request received`);
       }
-      const userNotifications = await sendUserNotifications(
-        baseNotification,
-        users,
-        { scope, origin },
-      );
-      notifications.push(...userNotifications);
-    }
 
-    res.json(notifications);
-  });
+      const origin = credentials.principal.subject;
+      const baseNotification = {
+        payload: {
+          ...payload,
+          severity: payload.severity ?? 'normal',
+        },
+        origin,
+        created: new Date(),
+      };
+
+      if (recipients.type === 'broadcast') {
+        const broadcast = await sendBroadcastNotification(
+          baseNotification,
+          opts,
+          origin,
+        );
+        notifications.push(broadcast);
+      } else {
+        const entityRef = recipients.entityRef;
+
+        try {
+          users = await getUsersForEntityRef(entityRef);
+        } catch (e) {
+          logger.error(`Failed to resolve notification receivers: ${e}`);
+          throw new InputError('Failed to resolve notification receivers', e);
+        }
+
+        const userNotifications = await sendUserNotifications(
+          baseNotification,
+          users,
+          opts,
+          origin,
+        );
+        notifications.push(...userNotifications);
+      }
+
+      res.json(notifications);
+    },
+  );
 
   router.use(errorHandler());
   return router;
